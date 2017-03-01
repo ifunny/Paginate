@@ -79,16 +79,18 @@ public final class RecyclerPaginate extends Paginate {
         int visibleItemCount = recyclerView.getChildCount();
         int totalItemCount = recyclerView.getLayoutManager().getItemCount();
 
-        MultiPaginateInterface adapter = (MultiPaginateInterface) wrapperAdapter.getWrappedAdapter();
-        int visibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-
-        int listType = 0;
-        if (visibleItemCount != 0) {
-            listType = adapter.getCurrentListIndex(visibleItemPosition);
-            totalItemCount = adapter.getListSize(listType);
-        }
+        int visibleItemPosition;
 
         if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+            MultiPaginateInterface adapter = (MultiPaginateInterface) wrapperAdapter.getWrappedAdapter();
+	        visibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+
+            int listType = 0;
+            if (visibleItemCount != 0) {
+                listType = adapter.getCurrentListIndex(visibleItemPosition);
+                totalItemCount = adapter.getListSize(listType);
+            }
+
             if (visibleItemCount > 0) {
                 visibleItemPosition = adapter.globalPositionToLocal(visibleItemPosition, listType);
                 if (visibleItemPosition == -1) {
