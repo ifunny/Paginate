@@ -82,21 +82,26 @@ public final class RecyclerPaginate extends Paginate {
         int visibleItemPosition;
 
         if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
-            MultiPaginateInterface adapter = (MultiPaginateInterface) wrapperAdapter.getWrappedAdapter();
-	        visibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
 
-            int listType = 0;
-            if (visibleItemCount != 0) {
-                listType = adapter.getCurrentListIndex(visibleItemPosition);
-                totalItemCount = adapter.getListSize(listType);
-            }
+            visibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
 
-            if (visibleItemCount > 0) {
-                visibleItemPosition = adapter.globalPositionToLocal(visibleItemPosition, listType);
-                if (visibleItemPosition == -1) {
-                    return;
+            if (wrapperAdapter.getWrappedAdapter() instanceof MultiPaginateInterface) {
+                MultiPaginateInterface adapter = (MultiPaginateInterface) wrapperAdapter.getWrappedAdapter();
+
+                int listType = 0;
+                if (visibleItemCount != 0) {
+                    listType = adapter.getCurrentListIndex(visibleItemPosition);
+                    totalItemCount = adapter.getListSize(listType);
+                }
+
+                if (visibleItemCount > 0) {
+                    visibleItemPosition = adapter.globalPositionToLocal(visibleItemPosition, listType);
+                    if (visibleItemPosition == -1) {
+                        return;
+                    }
                 }
             }
+
         } else if (recyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
             // https://code.google.com/p/android/issues/detail?id=181461
             if (recyclerView.getLayoutManager().getChildCount() > 0) {
