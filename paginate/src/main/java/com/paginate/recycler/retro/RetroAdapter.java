@@ -17,7 +17,41 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	public RetroAdapter(RecyclerView.Adapter adapter, LoadingListItemCreator creator) {
 		this.wrappedAdapter = adapter;
 		this.loadingListItemCreator = creator;
+		setHasStableIds(wrappedAdapter.hasStableIds());
+		wrappedAdapter.registerAdapterDataObserver(dataObserver);
 	}
+
+	private final RecyclerView.AdapterDataObserver dataObserver = new RecyclerView.AdapterDataObserver() {
+		@Override
+		public void onChanged() {
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public void onItemRangeInserted(int positionStart, int itemCount) {
+			notifyItemRangeInserted(getItemPositionInAdapter(positionStart), itemCount);
+		}
+
+		@Override
+		public void onItemRangeChanged(int positionStart, int itemCount) {
+			notifyItemRangeChanged(getItemPositionInAdapter(positionStart), itemCount);
+		}
+
+		@Override
+		public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+			notifyItemRangeChanged(getItemPositionInAdapter(positionStart), itemCount, payload);
+		}
+
+		@Override
+		public void onItemRangeRemoved(int positionStart, int itemCount) {
+			notifyItemRangeRemoved(getItemPositionInAdapter(positionStart), itemCount);
+		}
+
+		@Override
+		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+			notifyItemMoved(getItemPositionInAdapter(fromPosition), getItemPositionInAdapter(toPosition));
+		}
+	};
 
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -63,12 +97,6 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 				: wrappedAdapter.getItemId(getItemPositionInAdapter(position));
 	}
 
-
-	@Override
-	public void setHasStableIds(boolean hasStableIds) {
-		super.setHasStableIds(hasStableIds);
-		wrappedAdapter.setHasStableIds(hasStableIds);
-	}
 
 	public RecyclerView.Adapter getWrappedAdapter() {
 		return wrappedAdapter;

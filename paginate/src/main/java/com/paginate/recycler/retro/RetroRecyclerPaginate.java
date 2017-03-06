@@ -49,6 +49,7 @@ public final class RetroRecyclerPaginate extends Paginate {
 
 	}
 
+
 	@Override
 	public void setHasMoreDataToLoad(boolean hasMoreDataToLoad) {
 		if (wrapperAdapter != null) {
