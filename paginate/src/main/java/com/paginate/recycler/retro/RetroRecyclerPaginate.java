@@ -14,18 +14,21 @@ public final class RetroRecyclerPaginate extends Paginate {
 
 	private final RecyclerView recyclerView;
 	private final RetroCallbacks callbacks;
+	private final RetroCallbacks internalCallbacks;
 	private final int loadingTriggerThreshold;
 	private RetroAdapter wrapperAdapter;
 	private RetroWrapperSpanSizeLookup wrapperSpanSizeLookup;
 
 	RetroRecyclerPaginate(RecyclerView recyclerView,
 	                      RetroCallbacks callbacks,
+	                      RetroCallbacks internalCallbacks,
 	                      int loadingTriggerThreshold,
 	                      boolean addLoadingListItem,
 	                      LoadingListItemCreator loadingListItemCreator,
 	                      LoadingListItemSpanLookup loadingListItemSpanLookup) {
 		this.recyclerView = recyclerView;
 		this.callbacks = callbacks;
+		this.internalCallbacks = internalCallbacks;
 		this.loadingTriggerThreshold = loadingTriggerThreshold;
 
 		// Attach scrolling listener in order to perform end offset check on each scroll event
@@ -61,6 +64,26 @@ public final class RetroRecyclerPaginate extends Paginate {
 		if (wrapperAdapter != null) {
 			wrapperAdapter.displayStartLoadingRow(hasMoreDataToLoad);
 		}
+	}
+
+	public void setHasMoreInternalDataToLoad(int internalLoadPosition) {
+		if (wrapperAdapter != null) {
+			wrapperAdapter.displayInternalEndLoadingRow(internalLoadPosition);
+		}
+	}
+
+	public void setHasMoreInternalDataToLoadOnStart(int internalLoadPosition) {
+		if (wrapperAdapter != null) {
+			wrapperAdapter.displayInternalStartLoadingRow(internalLoadPosition);
+		}
+	}
+
+	public int getInternalLoadPosition() {
+		return wrapperAdapter.getInternalEndLoadingRow();
+	}
+
+	public int getInternalStartLoadPosition() {
+		return wrapperAdapter.getInternalStartLoadingRow();
 	}
 
 	@Override
@@ -107,15 +130,30 @@ public final class RetroRecyclerPaginate extends Paginate {
 		}
 
 		// Check if end of the list is reached (counting threshold) or if there is no items at all
-		if (totalItemCount <= (visibleItemEndPosition + loadingTriggerThreshold)) {
+		if (wrapperAdapter.getEndLoadingRowPosition() <= (visibleItemEndPosition + loadingTriggerThreshold)) {
 			// Call load more only if loading is not currently in progress and if there is more items to load
 			if (!callbacks.isLoading() && !callbacks.hasLoadedAllItems()) {
 				callbacks.onLoadMore();
 			}
-		} else if (0 >= (visibleItemStartPosition + loadingTriggerThreshold)) {
+		} else if (wrapperAdapter.getStartLoadingRowPosition() >= (visibleItemStartPosition - loadingTriggerThreshold)) {
 			// Call load more only if loading is not currently in progress and if there is more items to load
 			if (!callbacks.isLoadingFromStart() && !callbacks.hasLoadedAllItemsFromStart()) {
 				callbacks.onLoadMoreFromStart();
+			}
+		}
+
+		if (internalCallbacks != null) {
+			// Check if end of the list is reached (counting threshold) or if there is no items at all
+			if (wrapperAdapter.getEndInternalLoadingRowPosition() <= (visibleItemEndPosition + loadingTriggerThreshold)) {
+				// Call load more only if loading is not currently in progress and if there is more items to load
+				if (!internalCallbacks.isLoading() && !internalCallbacks.hasLoadedAllItems()) {
+					internalCallbacks.onLoadMore();
+				}
+			} else if (wrapperAdapter.getStartInternalLoadingRowPosition() >= (visibleItemStartPosition - loadingTriggerThreshold)) {
+				// Call load more only if loading is not currently in progress and if there is more items to load
+				if (!internalCallbacks.isLoadingFromStart() && !internalCallbacks.hasLoadedAllItemsFromStart()) {
+					internalCallbacks.onLoadMoreFromStart();
+				}
 			}
 		}
 	}
@@ -131,6 +169,7 @@ public final class RetroRecyclerPaginate extends Paginate {
 
 		private final RecyclerView recyclerView;
 		private final RetroCallbacks callbacks;
+		private RetroCallbacks internalCallbacks;
 
 		private int loadingTriggerThreshold = 5;
 		private boolean addLoadingListItem = true;
@@ -140,6 +179,11 @@ public final class RetroRecyclerPaginate extends Paginate {
 		public Builder(RecyclerView recyclerView, RetroCallbacks callbacks) {
 			this.recyclerView = recyclerView;
 			this.callbacks = callbacks;
+		}
+
+		public Builder setInternalCallbacks(RetroCallbacks internalCallbacks) {
+			this.internalCallbacks = internalCallbacks;
+			return this;
 		}
 
 		/**
@@ -214,7 +258,7 @@ public final class RetroRecyclerPaginate extends Paginate {
 				loadingListItemSpanLookup = new DefaultLoadingListItemSpanLookup(recyclerView.getLayoutManager());
 			}
 
-			return new RetroRecyclerPaginate(recyclerView, callbacks, loadingTriggerThreshold, addLoadingListItem,
+			return new RetroRecyclerPaginate(recyclerView, callbacks, internalCallbacks, loadingTriggerThreshold, addLoadingListItem,
 					loadingListItemCreator, loadingListItemSpanLookup);
 		}
 	}
