@@ -186,7 +186,11 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	public void displayStartLoadingRow(boolean startLoadingRow) {
 		if (this.startLoadingRow != startLoadingRow) {
 			this.startLoadingRow = startLoadingRow;
-			notifyDataSetChanged();
+			if (startLoadingRow) {
+				notifyItemInserted(0);
+			} else {
+				notifyItemRemoved(0);
+			}
 		}
 	}
 
@@ -194,6 +198,11 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		if (this.endLoadingRow != endLoadingRow) {
 			this.endLoadingRow = endLoadingRow;
 			notifyDataSetChanged();
+			if (endLoadingRow) {
+				notifyItemInserted(getItemCount() - 1);
+			} else {
+				notifyItemRemoved(getItemCount() - 1);
+			}
 		}
 	}
 
@@ -202,8 +211,15 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			throw new IllegalArgumentException();
 		}
 		if (this.internalStartLoadingRow != internalStartLoadingRow) {
+			int oldRow = this.internalStartLoadingRow;
 			this.internalStartLoadingRow = internalStartLoadingRow;
-			notifyDataSetChanged();
+			if (internalStartLoadingRow >= 0) {
+				notifyItemInserted(internalStartLoadingRow);
+			}
+			if (oldRow >= 0) {
+				notifyItemRemoved(oldRow);
+			}
+
 		}
 
 	}
@@ -213,8 +229,14 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			throw new IllegalArgumentException();
 		}
 		if (this.internalEndLoadingRow != internalEndLoadingRow) {
+			int oldRow = this.internalStartLoadingRow;
 			this.internalEndLoadingRow = internalEndLoadingRow;
-			notifyDataSetChanged();
+			if (internalEndLoadingRow >= 0) {
+				notifyItemInserted(internalEndLoadingRow);
+			}
+			if (oldRow >= 0) {
+				notifyItemRemoved(oldRow);
+			}
 		}
 
 	}
