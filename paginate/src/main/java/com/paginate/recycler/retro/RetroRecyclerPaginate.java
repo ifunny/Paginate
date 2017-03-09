@@ -86,6 +86,22 @@ public final class RetroRecyclerPaginate extends Paginate {
 		return wrapperAdapter.getInternalStartLoadingRow();
 	}
 
+	public int mapPositions(int position) {
+		return wrapperAdapter.getItemPositionInAdapter(position);
+	}
+
+	public int mapPositionsReverse(int position) {
+		return wrapperAdapter.getItemPositionFromAdapter(position);
+	}
+
+	public void registerObserver(RecyclerView.AdapterDataObserver observer) {
+		wrapperAdapter.registerAdapterDataObserver(observer);
+	}
+
+	public void unregisterObserver(RecyclerView.AdapterDataObserver observer) {
+		wrapperAdapter.unregisterAdapterDataObserver(observer);
+	}
+
 	@Override
 	public void unbind() {
 		recyclerView.removeOnScrollListener(mOnScrollListener);   // Remove scroll listener
