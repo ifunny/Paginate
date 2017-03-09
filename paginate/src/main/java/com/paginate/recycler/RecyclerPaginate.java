@@ -5,11 +5,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
-
+import com.paginate.DynamicLoadingItemListener;
 import com.paginate.MultiPaginateInterface;
 import com.paginate.Paginate;
 
-public final class RecyclerPaginate extends Paginate {
+public final class RecyclerPaginate extends Paginate implements DynamicLoadingItemListener {
 
     private final RecyclerView recyclerView;
     private final Callbacks callbacks;
