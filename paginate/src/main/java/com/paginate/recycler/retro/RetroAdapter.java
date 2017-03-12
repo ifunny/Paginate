@@ -6,55 +6,55 @@ import android.view.ViewGroup;
 import com.paginate.recycler.LoadingListItemCreator;
 
 class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
+	
 	private static final int ITEM_VIEW_TYPE_LOADING = Integer.MAX_VALUE - 50; // Magic
-
+	
 	private final RecyclerView.Adapter wrappedAdapter;
 	private final LoadingListItemCreator loadingListItemCreator;
 	private boolean startLoadingRow;
 	private boolean endLoadingRow;
 	private int internalStartLoadingRow = -1;
 	private int internalEndLoadingRow = -1;
-
+	
 	public RetroAdapter(RecyclerView.Adapter adapter, LoadingListItemCreator creator) {
 		this.wrappedAdapter = adapter;
 		this.loadingListItemCreator = creator;
 		setHasStableIds(wrappedAdapter.hasStableIds());
 		wrappedAdapter.registerAdapterDataObserver(dataObserver);
 	}
-
+	
 	private final RecyclerView.AdapterDataObserver dataObserver = new RecyclerView.AdapterDataObserver() {
 		@Override
 		public void onChanged() {
 			notifyDataSetChanged();
 		}
-
+		
 		@Override
 		public void onItemRangeInserted(int positionStart, int itemCount) {
-			notifyItemRangeInserted(getItemPositionInAdapter(positionStart), itemCount);
+			notifyItemRangeInserted(getItemPositionFromAdapter(positionStart), itemCount);
 		}
-
+		
 		@Override
 		public void onItemRangeChanged(int positionStart, int itemCount) {
-			notifyItemRangeChanged(getItemPositionInAdapter(positionStart), itemCount);
+			notifyItemRangeChanged(getItemPositionFromAdapter(positionStart), itemCount);
 		}
-
+		
 		@Override
 		public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
-			notifyItemRangeChanged(getItemPositionInAdapter(positionStart), itemCount, payload);
+			notifyItemRangeChanged(getItemPositionFromAdapter(positionStart), itemCount, payload);
 		}
-
+		
 		@Override
 		public void onItemRangeRemoved(int positionStart, int itemCount) {
-			notifyItemRangeRemoved(getItemPositionInAdapter(positionStart), itemCount);
+			notifyItemRangeRemoved(getItemPositionFromAdapter(positionStart), itemCount);
 		}
-
+		
 		@Override
 		public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-			notifyItemMoved(getItemPositionInAdapter(fromPosition), getItemPositionInAdapter(toPosition));
+			notifyItemMoved(getItemPositionFromAdapter(fromPosition), getItemPositionFromAdapter(toPosition));
 		}
 	};
-
+	
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		if (viewType == ITEM_VIEW_TYPE_LOADING) {
@@ -63,7 +63,7 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			return wrappedAdapter.onCreateViewHolder(parent, viewType);
 		}
 	}
-
+	
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		if (isLoadingRow(position)) {
@@ -72,8 +72,8 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			wrappedAdapter.onBindViewHolder(holder, getItemPositionInAdapter(position));
 		}
 	}
-
-
+	
+	
 	@Override
 	public int getItemCount() {
 		int innerCount = wrappedAdapter.getItemCount();
@@ -86,26 +86,26 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		additional += hasInternalEndLoadingRow() ? 1 : 0;
 		return innerCount + additional;
 	}
-
+	
 	@Override
 	public int getItemViewType(int position) {
 		return isLoadingRow(position)
 				? ITEM_VIEW_TYPE_LOADING
 				: wrappedAdapter.getItemViewType(getItemPositionInAdapter(position));
 	}
-
+	
 	@Override
 	public long getItemId(int position) {
 		return isLoadingRow(position)
 				? RecyclerView.NO_ID
 				: wrappedAdapter.getItemId(getItemPositionInAdapter(position));
 	}
-
-
+	
+	
 	public RecyclerView.Adapter getWrappedAdapter() {
 		return wrappedAdapter;
 	}
-
+	
 	public int getItemPositionInAdapter(int index) {
 		int decrease = 0;
 		decrease += startLoadingRow ? 1 : 0;
@@ -117,27 +117,27 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		}
 		return index - decrease;
 	}
-
+	
 	public int getItemPositionFromAdapter(int index) {
 		int increase = 0;
 		increase += startLoadingRow ? 1 : 0;
 		if (hasInternalStartLoadingRow()) {
-			increase += index >= internalStartLoadingRow ? 1 : 0;
+			increase += index > internalStartLoadingRow ? 1 : 0;
 		}
 		if (hasInternalEndLoadingRow()) {
-			increase += index >= internalEndLoadingRow ? 1 : 0;
+			increase += index > internalEndLoadingRow ? 1 : 0;
 		}
 		return index + increase;
 	}
-
+	
 	private boolean isEndLoadingRow(final int index) {
 		return getEndLoadingRowPosition() == index || getEndInternalLoadingRowPosition() == index;
 	}
-
+	
 	private boolean isStartLoadingRow(final int index) {
 		return getStartLoadingRowPosition() == index || getStartInternalLoadingRowPosition() == index;
 	}
-
+	
 	public int getEndLoadingRowPosition() {
 		if (!endLoadingRow) {
 			return -1;
@@ -148,7 +148,7 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		position += hasInternalEndLoadingRow() ? 1 : 0;
 		return position;
 	}
-
+	
 	public int getEndInternalLoadingRowPosition() {
 		if (!hasInternalEndLoadingRow()) {
 			return -1;
@@ -158,14 +158,14 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		position += hasInternalStartLoadingRow() ? 1 : 0;
 		return position;
 	}
-
+	
 	public int getStartLoadingRowPosition() {
 		if (!startLoadingRow) {
 			return -1;
 		}
 		return 0;
 	}
-
+	
 	public int getStartInternalLoadingRowPosition() {
 		if (!hasInternalStartLoadingRow()) {
 			return -1;
@@ -174,27 +174,27 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 		position += startLoadingRow ? 1 : 0;
 		return position;
 	}
-
+	
 	private boolean hasInternalStartLoadingRow() {
 		return internalStartLoadingRow >= 0;
 	}
-
+	
 	private boolean hasInternalEndLoadingRow() {
 		return internalEndLoadingRow >= 0;
 	}
-
+	
 	public boolean isLoadingRow(int position) {
 		return isStartLoadingRow(position) || isEndLoadingRow(position);
 	}
-
+	
 	public int getInternalStartLoadingRow() {
 		return internalStartLoadingRow;
 	}
-
+	
 	public int getInternalEndLoadingRow() {
 		return internalEndLoadingRow;
 	}
-
+	
 	public void displayStartLoadingRow(boolean startLoadingRow) {
 		if (this.startLoadingRow != startLoadingRow) {
 			this.startLoadingRow = startLoadingRow;
@@ -205,7 +205,7 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			}
 		}
 	}
-
+	
 	public void displayEndLoadingRow(boolean endLoadingRow) {
 		if (this.endLoadingRow != endLoadingRow) {
 			this.endLoadingRow = endLoadingRow;
@@ -217,7 +217,7 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			}
 		}
 	}
-
+	
 	public void displayInternalStartLoadingRow(int internalStartLoadingRow) {
 		if (internalEndLoadingRow != -1 && (internalStartLoadingRow == 0 || internalStartLoadingRow >= wrappedAdapter.getItemCount() -
 				1)) {
@@ -227,16 +227,16 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			int oldRow = this.internalStartLoadingRow;
 			this.internalStartLoadingRow = internalStartLoadingRow;
 			if (internalStartLoadingRow >= 0) {
-				notifyItemInserted(internalStartLoadingRow);
+				notifyItemInserted(getItemPositionFromAdapter(internalStartLoadingRow));
 			}
 			if (oldRow >= 0) {
-				notifyItemRemoved(oldRow);
+				notifyItemRemoved(getItemPositionFromAdapter((oldRow)));
 			}
-
+			
 		}
-
+		
 	}
-
+	
 	public void displayInternalEndLoadingRow(int internalEndLoadingRow) {
 		if (internalEndLoadingRow != -1 && (internalEndLoadingRow < 1 || internalEndLoadingRow >= wrappedAdapter.getItemCount() - 2)) {
 			throw new IllegalArgumentException();
@@ -245,12 +245,12 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 			int oldRow = this.internalEndLoadingRow;
 			this.internalEndLoadingRow = internalEndLoadingRow;
 			if (internalEndLoadingRow >= 0) {
-				notifyItemInserted(internalEndLoadingRow);
+				notifyItemInserted(getItemPositionFromAdapter(internalEndLoadingRow));
 			}
 			if (oldRow >= 0) {
-				notifyItemRemoved(oldRow);
+				notifyItemRemoved(getItemPositionFromAdapter(oldRow));
 			}
 		}
-
+		
 	}
 }
