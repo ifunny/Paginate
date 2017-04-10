@@ -219,10 +219,6 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	}
 	
 	public void displayInternalStartLoadingRow(int internalStartLoadingRow) {
-		if (internalEndLoadingRow != -1 && (internalStartLoadingRow == 0 || internalStartLoadingRow >= wrappedAdapter.getItemCount() -
-				1)) {
-			throw new IllegalArgumentException();
-		}
 		if (this.internalStartLoadingRow != internalStartLoadingRow) {
 			int oldRow = this.internalStartLoadingRow;
 			this.internalStartLoadingRow = internalStartLoadingRow;
@@ -238,9 +234,6 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	}
 	
 	public void displayInternalEndLoadingRow(int internalEndLoadingRow) {
-		if (internalEndLoadingRow != -1 && (internalEndLoadingRow < 1 || internalEndLoadingRow >= wrappedAdapter.getItemCount() - 2)) {
-			throw new IllegalArgumentException();
-		}
 		if (this.internalEndLoadingRow != internalEndLoadingRow) {
 			int oldRow = this.internalEndLoadingRow;
 			this.internalEndLoadingRow = internalEndLoadingRow;
