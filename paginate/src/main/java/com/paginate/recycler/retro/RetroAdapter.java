@@ -209,7 +209,6 @@ class RetroAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	public void displayEndLoadingRow(boolean endLoadingRow) {
 		if (this.endLoadingRow != endLoadingRow) {
 			this.endLoadingRow = endLoadingRow;
-			notifyDataSetChanged();
 			if (endLoadingRow) {
 				notifyItemInserted(getItemCount() - 1);
 			} else {

@@ -146,12 +146,19 @@ public final class RetroRecyclerPaginate extends Paginate {
 		}
 
 		// Check if end of the list is reached (counting threshold) or if there is no items at all
-		if (wrapperAdapter.getEndLoadingRowPosition() <= (visibleItemEndPosition + loadingTriggerThreshold)) {
+		
+		int loadingRowPosition = wrapperAdapter.getEndLoadingRowPosition();
+		if (loadingRowPosition != -1 &&
+				(loadingRowPosition <= (visibleItemEndPosition + loadingTriggerThreshold))) {
 			// Call load more only if loading is not currently in progress and if there is more items to load
 			if (!callbacks.isLoading() && !callbacks.hasLoadedAllItems()) {
 				callbacks.onLoadMore();
 			}
-		} else if (wrapperAdapter.getStartLoadingRowPosition() >= (visibleItemStartPosition - loadingTriggerThreshold)) {
+		}
+		
+		loadingRowPosition = wrapperAdapter.getStartLoadingRowPosition();
+		if (loadingRowPosition != -1 &&
+				(loadingRowPosition >= (visibleItemStartPosition - loadingTriggerThreshold))) {
 			// Call load more only if loading is not currently in progress and if there is more items to load
 			if (!callbacks.isLoadingFromStart() && !callbacks.hasLoadedAllItemsFromStart()) {
 				callbacks.onLoadMoreFromStart();
