@@ -167,15 +167,21 @@ public final class RetroRecyclerPaginate extends Paginate {
 
 		if (internalCallbacks != null) {
 			// Check if end of the list is reached (counting threshold) or if there is no items at all
-			if (wrapperAdapter.getEndInternalLoadingRowPosition() <= (visibleItemEndPosition + loadingTriggerThreshold)) {
+			int internalLoadingRowPosition = wrapperAdapter.getEndInternalLoadingRowPosition();
+			if (internalLoadingRowPosition != -1 &&
+					(internalLoadingRowPosition <= (visibleItemEndPosition + loadingTriggerThreshold))) {
 				// Call load more only if loading is not currently in progress and if there is more items to load
 				if (!internalCallbacks.isLoading() && !internalCallbacks.hasLoadedAllItems()) {
 					internalCallbacks.onLoadMore();
 				}
-			} else if (wrapperAdapter.getStartInternalLoadingRowPosition() >= (visibleItemStartPosition - loadingTriggerThreshold)) {
-				// Call load more only if loading is not currently in progress and if there is more items to load
-				if (!internalCallbacks.isLoadingFromStart() && !internalCallbacks.hasLoadedAllItemsFromStart()) {
-					internalCallbacks.onLoadMoreFromStart();
+			} else {
+				internalLoadingRowPosition = wrapperAdapter.getStartInternalLoadingRowPosition();
+				if (internalLoadingRowPosition != -1 &&
+						(internalLoadingRowPosition >= (visibleItemStartPosition - loadingTriggerThreshold))) {
+					// Call load more only if loading is not currently in progress and if there is more items to load
+					if (!internalCallbacks.isLoadingFromStart() && !internalCallbacks.hasLoadedAllItemsFromStart()) {
+						internalCallbacks.onLoadMoreFromStart();
+					}
 				}
 			}
 		}
